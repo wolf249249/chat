@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple LINE Chat</title>
+    <style>
+        /* 全体のスタイル */
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; background-color: #7494c0; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        /* ログイン画面 */
+        #login-screen { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #login-screen input { padding: 10px; width: 200px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; }
+        #login-screen button { padding: 10px 20px; background: #00c300; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* チャット画面 (初期は非表示) */
+        #chat-container { width: 100%; max-width: 400px; height: 90vh; background: #7494c0; display: none; flex-direction: column; }
+        
+        /* ヘッダー */
+        .header { background: #273246; color: white; padding: 15px; text-align: center; font-weight: bold; }
+
+        /* メッセージ表示エリア */
+        #chat-log { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+
+        /* 吹き出しの共通設定 */
+        .msg { max-width: 70%; padding: 10px; border-radius: 15px; position: relative; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .msg-left { align-self: flex-start; background: white; border-top-left-radius: 2px; margin-left: 10px; }
+        .msg-right { align-self: flex-end; background: #85e249; border-top-right-radius: 2px; margin-right: 10px; }
+        .user-name { font-size: 10px; color: #333; margin-bottom: 2px; }
+
+        /* 入力エリア */
+        .input-area { background: white; padding: 10px; display: flex; gap: 10px; }
+        #message-input { flex: 1; border: none; background: #f0f0f0; padding: 10px; border-radius: 20px; outline: none; }
+        #send-btn { background: none; border: none; color: #00c300; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h3>名前を入力して開始</h3>
+        <input type="text" id="username-input" placeholder="お名前">
+        <br>
+        <button onclick="joinChat()">チャットに入る</button>
+    </div>
+
+    <div id="chat-container">
+        <div class="header" id="chat-header">チャットルーム</div>
+        <div id="chat-log">
+            <div class="msg msg-left">
+                <div class="user-name">運営</div>
+                ようこそ！メッセージを入力してみてね。
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="message-input" placeholder="メッセージを入力">
+            <button id="send-btn" onclick="sendMessage()">送信</button>
+        </div>
+    </div>
+
+    <script>
+        let myName = "";
+
+        // チャットに参加
+        function joinChat() {
+            const input = document.getElementById('username-input');
+            if (input.value.trim() === "") return alert("名前を入れてね！");
+            
+            myName = input.value;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('chat-container').style.display = 'flex';
+            document.getElementById('chat-header').innerText = myName + " さんのチャット";
+        }
+
+        // メッセージ送信
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const log = document.getElementById('chat-log');
+            
+            if (input.value.trim() === "") return;
+
+            // 自分のメッセージを追加
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('msg', 'msg-right');
+            msgDiv.innerText = input.value;
+            log.appendChild(msgDiv);
+
+            // 入力欄をクリア
+            input.value = "";
+            
+            // 下までスクロール
+            log.scrollTop = log.scrollHeight;
+
+            // (おまけ) 1秒後に自動返信
+            setTimeout(() => {
+                const replyDiv = document.createElement('div');
+                replyDiv.classList.add('msg', 'msg-left');
+                replyDiv.innerHTML = `<div class="user-name">bot</div>既読です！`;
+                log.appendChild(replyDiv);
+                log.scrollTop = log.scrollHeight;
+            }, 1000);
+        }
+
+        // Enterキーで送信
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
